@@ -38,79 +38,69 @@ const fakeLines = {
   };
   
 
-  function initMap() {
-    map = new google.maps.Map(document.getElementById("map"), {
-      zoom: 15,
-      center: { lat: 52.2297, lng: 21.0122 },
-    });
+function initMap() {
+  map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 15,
+    center: { lat: 52.2297, lng: 21.0122 },
+  });
+
+  marker = new google.maps.Marker({
+    map,
+    title: "Twoja lokalizacja",
+  });
   
-    marker = new google.maps.Marker({
-      map,
-      title: "Twoja lokalizacja",
-      icon: {
-        url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",  // Użyj ikonki niebieskiego koła
-        scaledSize: new google.maps.Size(40, 40), // Ustalamy rozmiar, żeby było ładnie
+
+  if (navigator.geolocation) {
+    watchId = navigator.geolocation.watchPosition(
+      position => {
+        const pos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+
+        marker.setPosition(pos);
+        map.setCenter(pos);
       },
-    });
+      () => alert("Błąd przy pobieraniu lokalizacji.")
+    );
+  }
+
+// Aktualizacja przystanku co 2 sekundy
+setInterval(() => {
+    if (!activeLine || !marker.getPosition()) return;
   
-    if (navigator.geolocation) {
-      watchId = navigator.geolocation.watchPosition(
-        position => {
-          const pos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
+    const userPos = marker.getPosition();
   
-          marker.setPosition(pos);
-          map.setCenter(pos);
-        },
-        () => alert("Błąd przy pobieraniu lokalizacji.")
-      );
+    if (currentStopIndex >= activeLine.stops.length) {
+      document.getElementById("ibis-next").innerText = "Koniec trasy.";
+      return;
     }
   
-    // Ustawienie Directions API dla trasy
-    directionsService = new google.maps.DirectionsService();
-    directionsRenderer = new google.maps.DirectionsRenderer({ map });
+    const stop = activeLine.stops[currentStopIndex];
+    const stopPos = new google.maps.LatLng(stop.lat, stop.lng);
+    const dist = google.maps.geometry.spherical.computeDistanceBetween(userPos, stopPos);
   
-    // Aktualizacja przystanku co 2 sekundy
-    setInterval(() => {
-      if (!activeLine || !marker.getPosition()) return;
-  
-      const userPos = marker.getPosition();
-  
+    if (dist <= 5) {
+      wasNearStop = true;
+    } else if (wasNearStop && dist > 10) {
+      wasNearStop = false;
+      currentStopIndex++;
       if (currentStopIndex >= activeLine.stops.length) {
         document.getElementById("ibis-next").innerText = "Koniec trasy.";
         return;
       }
+    }
   
-      const stop = activeLine.stops[currentStopIndex];
-      const stopPos = new google.maps.LatLng(stop.lat, stop.lng);
-      const dist = google.maps.geometry.spherical.computeDistanceBetween(userPos, stopPos);
+    if (currentStopIndex < activeLine.stops.length) {
+      const nextStop = activeLine.stops[currentStopIndex];
+      const nextStopPos = new google.maps.LatLng(nextStop.lat, nextStop.lng);
+      const distance = google.maps.geometry.spherical.computeDistanceBetween(userPos, nextStopPos);
+      document.getElementById("ibis-next").innerText =
+        `Następny przystanek: ${nextStop.name} (${Math.round(distance)} m)`;
+    }
+  }, 2000);
   
-      if (dist <= 5) {
-        wasNearStop = true;
-      } else if (wasNearStop && dist > 10) {
-        wasNearStop = false;
-        currentStopIndex++;
-        if (currentStopIndex >= activeLine.stops.length) {
-          document.getElementById("ibis-next").innerText = "Koniec trasy.";
-          return;
-        }
-      }
-  
-      if (currentStopIndex < activeLine.stops.length) {
-        const nextStop = activeLine.stops[currentStopIndex];
-        const nextStopPos = new google.maps.LatLng(nextStop.lat, nextStop.lng);
-        const distance = google.maps.geometry.spherical.computeDistanceBetween(userPos, nextStopPos);
-        document.getElementById("ibis-next").innerText =
-          `Następny przystanek: ${nextStop.name} (${Math.round(distance)} m)`;
-  
-        // Dodajemy funkcję nawigacji, która rysuje trasę do kolejnego przystanku
-        calculateRoute(userPos, nextStopPos);
-      }
-    }, 2000);
-  }
-  
+}
 
 function loadFakeLine() {
     const line = document.getElementById("lineNumber").value;
