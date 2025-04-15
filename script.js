@@ -9,30 +9,66 @@ const fakeLines = {
     "101": {
       directions: {
         "PKP Józefów": [
-          { name: "Metalizacja", lat: 52.12205, lng: 21.20930 },
-          { name: "Godebskiego", lat: 52.12352, lng: 21.21154 },
-          { name: "Łąkowa", lat: 52.12612, lng: 21.21558 },
-          { name: "Prusa", lat: 52.12809, lng: 21.21871 },
-          { name: "Sienkiewicza", lat: 52.13077, lng: 21.22406 },
-          { name: "3-go Maja", lat: 52.13284, lng: 21.22779 },
-          { name: "Świderska", lat: 52.13499, lng: 21.23167 },
-          { name: "Urząd Miasta", lat: 52.13635, lng: 21.23438 },
-          { name: "PKP Józefów", lat: 52.13620, lng: 21.23594 }
+          { name: "Metalizacja 01", lat: 52.12205, lng: 21.20930 },
+          { name: "Godebskiego 01", lat: 52.12352, lng: 21.21154 },
+          { name: "Łąkowa 01", lat: 52.12612, lng: 21.21558 },
+          { name: "Prusa 01", lat: 52.12809, lng: 21.21871 },
+          { name: "Sienkiewicza 01", lat: 52.13077, lng: 21.22406 },
+          { name: "3-go Maja 01", lat: 52.13284, lng: 21.22779 },
+          { name: "Świderska 01", lat: 52.13499, lng: 21.23167 },
+          { name: "Urząd Miasta 01", lat: 52.13635, lng: 21.23438 },
+          { name: "PKP Józefów 01", lat: 52.13620, lng: 21.23594 }
           
           
         ],
         "Metalizacja": [
-          { name: "PKP Józefów", lat: 52.13620, lng: 21.23594 },
-          { name: "Sosnowa", lat: 52.13514, lng: 21.23411 },
-          { name: "Świderska", lat: 52.13499, lng: 21.23167 },
-          { name: "3-go Maja", lat: 52.13284, lng: 21.22779 },
-          { name: "Sienkiewicza", lat: 52.13077, lng: 21.22406 },
-          { name: "Prusa", lat: 52.12809, lng: 21.21871 },
-          { name: "Łąkowa", lat: 52.12612, lng: 21.21558 },
-          { name: "Godebskiego", lat: 52.12352, lng: 21.21154 },
-          { name: "Metalizacja", lat: 52.12205, lng: 21.20930 }
+          { name: "PKP Józefów 01", lat: 52.13620, lng: 21.23594 },
+          { name: "Sosnowa 01", lat: 52.13514, lng: 21.23411 },
+          { name: "Świderska 01", lat: 52.13499, lng: 21.23167 },
+          { name: "3-go Maja 01", lat: 52.13284, lng: 21.22779 },
+          { name: "Sienkiewicza 01", lat: 52.13077, lng: 21.22406 },
+          { name: "Prusa 01", lat: 52.12809, lng: 21.21871 },
+          { name: "Łąkowa 01", lat: 52.12612, lng: 21.21558 },
+          { name: "Godebskiego 01", lat: 52.12352, lng: 21.21154 },
+          { name: "Metalizacja 01", lat: 52.12205, lng: 21.20930 }
 
         ]
+      }
+    },
+    "102": {
+      directions: {
+        "PKP Józefów": [
+          { name: "Metalizacja 01", lat: 52.12205, lng: 21.20930 },
+          { name: "Godebskiego 01", lat: 52.12352, lng: 21.21154 },
+          { name: "Łąkowa 01", lat: 52.12612, lng: 21.21558 },
+          { name: "Prusa 01", lat: 52.12809, lng: 21.21871 },
+          { name: "Wyszyńskiego 01", lat: 52.13004, lng: 21.22379 },
+          { name: "Leśna 01", lat: 52.12878, lng: 21.22611 },
+          { name: "ICSIR 01", lat: 52.12831, lng: 21.2283 },
+          { name: "Powstańców Warszawy 01", lat: 52.12712, lng: 21.23019 },
+          { name: "Oczyszczalnia Ścieków 01", lat: 52.12599, lng: 21.23425 },
+          { name: "Szkoła Strumienie 01", lat: 52.1266, lng: 21.23778 },
+          { name: "Jarosławska 01", lat: 52.12831, lng: 21.24006 },
+          { name: "Powstańców Warszawy 02", lat: 52.1331, lng: 21.23903 },
+          { name: "Leśna 02", lat: 52.13511, lng: 21.23707 },
+          { name: "PKP Józefów 01", lat: 52.13618, lng: 21.23597 }
+        ],
+        "Metalizacja": [
+            { name: "PKP Józefów 01", lat: 52.13620, lng: 21.23594 },
+            { name: "Leśna 02", lat: 52.13511, lng: 21.23707 },
+            { name: "Powstańców Warszawy 02", lat: 52.1331, lng: 21.23903 },
+            { name: "Jarosławska 01", lat: 52.12831, lng: 21.24006 },
+            { name: "Szkoła Strumienie 01", lat: 52.1266, lng: 21.23778 },
+            { name: "Oczyszczalnia Ścieków 01", lat: 52.12599, lng: 21.23425 },
+            { name: "Powstańców Warszawy 01", lat: 52.12712, lng: 21.23019 },
+            { name: "ICSIR 01", lat: 52.12831, lng: 21.2283 },
+            { name: "Leśna 01", lat: 52.12878, lng: 21.22611 },
+            { name: "Wyszyńskiego 01", lat: 52.13004, lng: 21.22379 },
+            { name: "Prusa 01", lat: 52.12809, lng: 21.21871 },
+            { name: "Łąkowa 01", lat: 52.12612, lng: 21.21558 },
+            { name: "Godebskiego 01", lat: 52.12352, lng: 21.21154 },
+            { name: "Metalizacja 01", lat: 52.12205, lng: 21.20930 }
+          ]
       }
     }
   };
