@@ -4,6 +4,11 @@ let activeLine = null;
 let currentStopIndex = 0;
 let wasNearStop = false;
 
+// Wstawienie ikony samochodzika
+const carIcon = {
+  url: "https://i.imgur.com/Fy0rspp.png",  // Podmień ten URL na rzeczywisty link do ikony samochodu
+  scaledSize: new google.maps.Size(40, 40), // Rozmiar ikony (dopasuj według potrzeb)
+};
 
 const fakeLines = {
     "101": {
@@ -18,8 +23,6 @@ const fakeLines = {
           { name: "Świderska", lat: 52.13499, lng: 21.23167 },
           { name: "Urząd Miasta", lat: 52.13635, lng: 21.23438 },
           { name: "PKP Józefów", lat: 52.13620, lng: 21.23594 }
-          
-          
         ],
         "Metalizacja": [
           { name: "PKP Józefów", lat: 52.13620, lng: 21.23594 },
@@ -31,24 +34,24 @@ const fakeLines = {
           { name: "Łąkowa", lat: 52.12612, lng: 21.21558 },
           { name: "Godebskiego", lat: 52.12352, lng: 21.21154 },
           { name: "Metalizacja", lat: 52.12205, lng: 21.20930 }
-
         ]
       }
     }
-  };
-  
+};
 
+// Funkcja inicjalizująca mapę
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     zoom: 15,
     center: { lat: 52.2297, lng: 21.0122 },
+    rotateControl: true, // Włączenie obrotu mapy
   });
 
   marker = new google.maps.Marker({
     map,
     title: "Twoja lokalizacja",
+    icon: carIcon,  // Ustawienie ikony samochodzik
   });
-  
 
   if (navigator.geolocation) {
     watchId = navigator.geolocation.watchPosition(
@@ -65,8 +68,8 @@ function initMap() {
     );
   }
 
-// Aktualizacja przystanku co 2 sekundy
-setInterval(() => {
+  // Aktualizacja przystanku co 2 sekundy
+  setInterval(() => {
     if (!activeLine || !marker.getPosition()) return;
   
     const userPos = marker.getPosition();
@@ -99,9 +102,9 @@ setInterval(() => {
         `Następny przystanek: ${nextStop.name} (${Math.round(distance)} m)`;
     }
   }, 2000);
-  
 }
 
+// Funkcja ładowania trasy
 function loadFakeLine() {
     const line = document.getElementById("lineNumber").value;
     const direction = document.getElementById("lineDirection").value;
@@ -118,7 +121,6 @@ function loadFakeLine() {
     wasNearStop = false;
 
      // Tylko przystanki
-  
     if (linePath) linePath.setMap(null);
     lineMarkers.forEach(m => m.setMap(null));
     lineMarkers = [];
@@ -152,9 +154,7 @@ function loadFakeLine() {
     });
   
     document.getElementById("ibis-next").innerText = "Oczekiwanie na ruch...";
-  }
-  
-
+}
 
 function loadLineDirections() {
     const line = document.getElementById("lineNumber").value;
@@ -181,5 +181,4 @@ function loadLineDirections() {
     }
   
     directionContainer.style.display = "block";
-  }
-  
+}
