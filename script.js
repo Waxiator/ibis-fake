@@ -1,6 +1,9 @@
 let map, marker, watchId;
 let linePath, lineMarkers = [];
 let activeLine = null;
+let currentStopIndex = 0;
+let wasNearStop = false;
+
 
 const fakeLines = {
     "101": {
@@ -44,10 +47,8 @@ function initMap() {
   marker = new google.maps.Marker({
     map,
     title: "Twoja lokalizacja",
-    icon: {
-      url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-    },
   });
+  
 
   if (navigator.geolocation) {
     watchId = navigator.geolocation.watchPosition(
@@ -64,32 +65,41 @@ function initMap() {
     );
   }
 
-  // Aktualizacja przystanku co 2 sekundy
-  setInterval(() => {
+// Aktualizacja przystanku co 2 sekundy
+setInterval(() => {
     if (!activeLine || !marker.getPosition()) return;
-
+  
     const userPos = marker.getPosition();
-
-    let minDist = Infinity;
-    let nearestStop = null;
-
-    activeLine.stops.forEach(stop => {
-      const dist = google.maps.geometry.spherical.computeDistanceBetween(
-        userPos,
-        new google.maps.LatLng(stop.lat, stop.lng)
-      );
-
-      if (dist < minDist) {
-        minDist = dist;
-        nearestStop = stop;
+  
+    if (currentStopIndex >= activeLine.stops.length) {
+      document.getElementById("ibis-next").innerText = "Koniec trasy.";
+      return;
+    }
+  
+    const stop = activeLine.stops[currentStopIndex];
+    const stopPos = new google.maps.LatLng(stop.lat, stop.lng);
+    const dist = google.maps.geometry.spherical.computeDistanceBetween(userPos, stopPos);
+  
+    if (dist <= 5) {
+      wasNearStop = true;
+    } else if (wasNearStop && dist > 10) {
+      wasNearStop = false;
+      currentStopIndex++;
+      if (currentStopIndex >= activeLine.stops.length) {
+        document.getElementById("ibis-next").innerText = "Koniec trasy.";
+        return;
       }
-    });
-
-    if (nearestStop) {
+    }
+  
+    if (currentStopIndex < activeLine.stops.length) {
+      const nextStop = activeLine.stops[currentStopIndex];
+      const nextStopPos = new google.maps.LatLng(nextStop.lat, nextStop.lng);
+      const distance = google.maps.geometry.spherical.computeDistanceBetween(userPos, nextStopPos);
       document.getElementById("ibis-next").innerText =
-        `Następny przystanek: ${nearestStop.name} (${Math.round(minDist)} m)`;
+        `Następny przystanek: ${nextStop.name} (${Math.round(distance)} m)`;
     }
   }, 2000);
+  
 }
 
 function loadFakeLine() {
@@ -103,7 +113,11 @@ function loadFakeLine() {
     }
   
     const stops = data.directions[direction];
-    activeLine = { stops }; // Tylko przystanki
+    activeLine = { stops };
+    currentStopIndex = 0;
+    wasNearStop = false;
+
+     // Tylko przystanki
   
     if (linePath) linePath.setMap(null);
     lineMarkers.forEach(m => m.setMap(null));
