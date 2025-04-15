@@ -1,76 +1,171 @@
-let map, marker, watchId, linePath, lineMarkers = [];
-const fakeLineCoordinates = [
-  { lat: 52.2297, lng: 21.0122 }, // przykładowe przystanki
-  { lat: 52.2305, lng: 21.0150 },
-  { lat: 52.2312, lng: 21.0180 },
-  { lat: 52.2320, lng: 21.0200 }
-];
+let map, marker, watchId;
+let linePath, lineMarkers = [];
+let activeLine = null;
+
+const fakeLines = {
+    "101": {
+      directions: {
+        "PKP Józefów": [
+          { name: "Metalizacja", lat: 52.12205, lng: 21.20930 },
+          { name: "Godebskiego", lat: 52.12352, lng: 21.21154 },
+          { name: "Łąkowa", lat: 52.12612, lng: 21.21558 },
+          { name: "Prusa", lat: 52.12809, lng: 21.21871 },
+          { name: "Sienkiewicza", lat: 52.13077, lng: 21.22406 },
+          { name: "3-go Maja", lat: 52.13284, lng: 21.22779 },
+          { name: "Świderska", lat: 52.13499, lng: 21.23167 },
+          { name: "Urząd Miasta", lat: 52.13635, lng: 21.23438 },
+          { name: "PKP Józefów", lat: 52.13620, lng: 21.23594 }
+          
+          
+        ],
+        "Metalizacja": [
+          { name: "PKP Józefów", lat: 52.13620, lng: 21.23594 },
+          { name: "Sosnowa", lat: 52.13514, lng: 21.23411 },
+          { name: "Świderska", lat: 52.13499, lng: 21.23167 },
+          { name: "3-go Maja", lat: 52.13284, lng: 21.22779 },
+          { name: "Sienkiewicza", lat: 52.13077, lng: 21.22406 },
+          { name: "Prusa", lat: 52.12809, lng: 21.21871 },
+          { name: "Łąkowa", lat: 52.12612, lng: 21.21558 },
+          { name: "Godebskiego", lat: 52.12352, lng: 21.21154 },
+          { name: "Metalizacja", lat: 52.12205, lng: 21.20930 }
+
+        ]
+      }
+    }
+  };
+  
 
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     zoom: 15,
-    center: fakeLineCoordinates[0],
-    mapId: "your_map_id" // jeśli chcesz custom mapę
+    center: { lat: 52.2297, lng: 21.0122 },
   });
 
   marker = new google.maps.Marker({
     map,
+    title: "Twoja lokalizacja",
     icon: {
-      path: google.maps.SymbolPath.CIRCLE,
-      scale: 8,
-      fillColor: "blue",
-      fillOpacity: 1,
-      strokeWeight: 2
-    }
+      url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+    },
   });
 
   if (navigator.geolocation) {
     watchId = navigator.geolocation.watchPosition(
-      (position) => {
+      position => {
         const pos = {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         };
+
         marker.setPosition(pos);
         map.setCenter(pos);
       },
-      () => {
-        alert("Nie można pobrać lokalizacji.");
-      },
-      { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+      () => alert("Błąd przy pobieraniu lokalizacji.")
     );
   }
+
+  // Aktualizacja przystanku co 2 sekundy
+  setInterval(() => {
+    if (!activeLine || !marker.getPosition()) return;
+
+    const userPos = marker.getPosition();
+
+    let minDist = Infinity;
+    let nearestStop = null;
+
+    activeLine.stops.forEach(stop => {
+      const dist = google.maps.geometry.spherical.computeDistanceBetween(
+        userPos,
+        new google.maps.LatLng(stop.lat, stop.lng)
+      );
+
+      if (dist < minDist) {
+        minDist = dist;
+        nearestStop = stop;
+      }
+    });
+
+    if (nearestStop) {
+      document.getElementById("ibis-next").innerText =
+        `Następny przystanek: ${nearestStop.name} (${Math.round(minDist)} m)`;
+    }
+  }, 2000);
 }
 
 function loadFakeLine() {
-  const line = document.getElementById("lineNumber").value;
-  const direction = document.getElementById("lineDirection").value;
-
-  alert(`Załadowano linię ${line} w kierunku ${direction}`);
-
-  // Wyczyść poprzednią linię
-  if (linePath) linePath.setMap(null);
-  lineMarkers.forEach(m => m.setMap(null));
-  lineMarkers = [];
-
-  // Narysuj linię
-  linePath = new google.maps.Polyline({
-    path: fakeLineCoordinates,
-    geodesic: true,
-    strokeColor: "#00FF00",
-    strokeOpacity: 1.0,
-    strokeWeight: 4,
-  });
-
-  linePath.setMap(map);
-
-  // Dodaj markery przystanków
-  fakeLineCoordinates.forEach(coord => {
-    const m = new google.maps.Marker({
-      position: coord,
-      map,
-      icon: "https://maps.google.com/mapfiles/ms/icons/bus.png"
+    const line = document.getElementById("lineNumber").value;
+    const direction = document.getElementById("lineDirection").value;
+  
+    const data = fakeLines[line];
+    if (!data || !data.directions[direction]) {
+      alert("Nieprawidłowy numer linii lub kierunek.");
+      return;
+    }
+  
+    const stops = data.directions[direction];
+    activeLine = { stops }; // Tylko przystanki
+  
+    if (linePath) linePath.setMap(null);
+    lineMarkers.forEach(m => m.setMap(null));
+    lineMarkers = [];
+  
+    const coords = stops.map(s => ({ lat: s.lat, lng: s.lng }));
+  
+    linePath = new google.maps.Polyline({
+      path: coords,
+      geodesic: true,
+      strokeColor: "#00FF00",
+      strokeOpacity: 1.0,
+      strokeWeight: 4,
     });
-    lineMarkers.push(m);
-  });
-}
+    linePath.setMap(map);
+  
+    stops.forEach(stop => {
+      const marker = new google.maps.Marker({
+        position: { lat: stop.lat, lng: stop.lng },
+        map,
+        icon: "https://maps.google.com/mapfiles/ms/icons/bus.png",
+        title: stop.name,
+      });
+  
+      marker.addListener("click", () => {
+        new google.maps.InfoWindow({
+          content: `<b>${stop.name}</b>`
+        }).open(map, marker);
+      });
+  
+      lineMarkers.push(marker);
+    });
+  
+    document.getElementById("ibis-next").innerText = "Oczekiwanie na ruch...";
+  }
+  
+
+
+function loadLineDirections() {
+    const line = document.getElementById("lineNumber").value;
+    const lineData = fakeLines[line];
+  
+    const directionSelect = document.getElementById("lineDirection");
+    const directionContainer = document.getElementById("directionContainer");
+  
+    if (!lineData) {
+      alert("Nie znaleziono takiej linii.");
+      directionContainer.style.display = "none";
+      return;
+    }
+  
+    // Wyczyść stare opcje
+    directionSelect.innerHTML = "";
+  
+    // Wstaw nowe kierunki
+    for (const dir in lineData.directions) {
+      const option = document.createElement("option");
+      option.value = dir;
+      option.text = dir;
+      directionSelect.appendChild(option);
+    }
+  
+    directionContainer.style.display = "block";
+  }
+  

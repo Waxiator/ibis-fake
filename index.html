@@ -3,21 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IBIS Fake</title>
+  <title>Symulator IBIS</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="ibis">
-    <h1>🚌 IBIS</h1>
-    <input type="text" id="lineNumber" placeholder="Numer linii" />
-    <input type="text" id="lineDirection" placeholder="Kierunek" />
-    <button onclick="loadFakeLine()">Pokaż linię</button>
+<div class="ibis">
+  <label for="lineNumber">Numer linii:</label>
+  <input type="text" id="lineNumber" placeholder="Np. 101" />
+  <button onclick="loadLineDirections()">Dalej</button>
+
+  <div id="directionContainer" style="margin-top: 10px; display: none;">
+    <label for="lineDirection">Kierunek:</label>
+    <select id="lineDirection"></select>
+    <button onclick="loadFakeLine()">Wczytaj linię</button>
   </div>
+</div>
+
+
+  <div class="ibis-next" id="ibis-next">Brak aktywnej trasy</div>
+
   <div id="map"></div>
 
   <script src="script.js"></script>
   <script async
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDguFArRjbPvWuIEkbWwZ5Ao7wokRF6pzU&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDguFArRjbPvWuIEkbWwZ5Ao7wokRF6pzU&libraries=geometry&callback=initMap">
   </script>
 </body>
 </html>
